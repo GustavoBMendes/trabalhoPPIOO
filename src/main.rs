@@ -1,6 +1,7 @@
 use std::io;
 use std::collections::LinkedList;
 
+
 fn cabecalho() {
     println!("");
 	println!("*** TRABALHO PPIOO - PROFESSOR MARCO AURÉLIO ***");
@@ -61,5 +62,21 @@ fn main() {
 
     	i += 1;                             //incrementar indice
     }
+
+    println!("Imprimindo tokens da lista...");
+
+    for tokens in list.iter_mut() {
+        println!("{}", tokens);
+    }
+
+	println!("Criando a pilha de operadores...");
+	let mut stack = LinkedList::new();
+	for tokens in list.iter_mut() {
+		stack.push_back(tokens);
+	}
+
+	for operators in stack.iter_mut() {
+		println!("{}", operators);
+	}
 
 }
