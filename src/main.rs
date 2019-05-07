@@ -30,29 +30,28 @@ fn main() {
     println!("Dividindo a expressão em tokens e inserindo em uma lista.");
 
     let mut i = 0;
-    let mut j = 0;                          //índices i e j para pegar determinado token
+    let mut j = 0;                          		//índices i e j para pegar determinado token
 
-    let mut list = LinkedList::new();       //lista de tokens
-
+	let mut tokensList: Vec<&str> = Vec::new();		//lista de tokens
     for c in expr.chars() {
     	
-    	if c == ' ' || c == '\n'{           //encontrou espaço ou fim de linha, pegar tokens
-			let tokens = &expr[j..i];
-			list.push_back(tokens);
+    	if c == ' ' || c == '\n'{           		//encontrou espaço ou fim de linha, pegar tokens
+			let token = &expr[j..i];
+			tokensList.push(token);
 			j = i+1;
     	}
 
 		else if c == '('{                   //encontrou parenteses
 			i += 1;
 			let parenteses = &expr[j..i];
-    		list.push_back(parenteses);
+			tokensList.push(parenteses);
     		j = i;
 			continue;
 		}
 
 		else if c == ')' {                  //fecha parenteses
 			let parenteses = &expr[j..i];
-    		list.push_back(parenteses);
+			tokensList.push(parenteses);
     		j = i;
 			i += 1;
 			continue;
@@ -62,56 +61,67 @@ fn main() {
     }
 
     println!("Imprimindo tokens da lista...");
-
-    for tokens in list.iter_mut() {
-        println!("{}", tokens);
-    }
+	println!("{:?}", tokensList);
 
 	println!("Criando a pilha de operadores e a fila de saída dos tokens...");
-	let mut stack = LinkedList::new();
-	let mut fila: Queue<&str> = queue![];
-	for tokens in list.iter_mut() {
-		let topo_pilha = stack.back_mut();
-		if tokens != &"*" || tokens != &"/" || tokens != &"+" || tokens != &"-" || tokens != &"(" || tokens != &")" {
-			fila.add(tokens); 			//é um número, adicionar na fila de saída
+	let mut stack: Vec<&str> = Vec::new();
+	let mut fila: Vec<&str> = Vec::new();
+	
+	let mut k = 0;
+
+	for tokens in tokensList.iter() {
+
+		if tokens != &"*" && tokens != &"/" && tokens != &"+" && tokens != &"-" && tokens != &"(" && tokens != &")" {
+			fila.push(tokens); 			//é um número, adicionar na fila de saída
 		}
 
 		else if tokens == &"*" || tokens == &"/" || tokens == &"(" {
-			stack.push_back(tokens);	//operadores de maior precedencia, empilha
+			stack.push(tokens);	//operadores de maior precedencia, empilha
+			k += 1;
 		}
 
 		else if tokens == &"+" || tokens == &"-" {
-			if stack.is_empty() || stack.back_mut() != "*" || stack.back_mut() != "/"{
-				stack.push_back(tokens);	//operadores de menor precedencia
-											//empilha caso nao existe um de maior precedencia no topo
+			if stack.is_empty() || (stack[k-1] != "*" && stack[k-1] != "/") {
+				stack.push(tokens);	//operadores de menor precedencia
+				k += 1;				//empilha caso nao existe um de maior precedencia no topo
 			}
 
 			else {
-				let mult: Option<&mut &str> = Some("*");
-				while stack.back_mut() ==  mult || stack.back_mut() == "/" {
-					let mut op = stack.pop_back();
-					fila.add(op);			//fila recebe op
+				
+				while stack[k-1] ==  "*" || stack[k-1] == "/" {
+					let mut op = stack[k-1];
+					fila.push(op);			//fila recebe operador
+					k -= 1;
+					stack.pop();
 				}
+				stack.push(tokens);
 			}
 		}
 
 		else if tokens == &")" {
-			while stack.back_mut() != &"(" {
-				let mut op = stack.pop_back();
-				fila.add(op);				//fila recebe op
+			while stack[k-1] != "(" {
+				let mut op = stack[k-1];
+				fila.push(op);			//fila recebe op
+				k -= 1;
+				stack.pop();
 			}
-			stack.pop_back();
+			stack.pop();
 		}	
 
 	}
 	//acabou lista de tokens, desempilha todo o resto da pilha e insere na fila
-	while !(stack.is_empty()) {
-		let mut op = stack.pop_back();
-		fila.add(op);						//insere op na fila
-	}
 	
-	for operators in stack.iter_mut() {
-		println!("{}", operators);
+	println!("{}", k);
+
+//	while k >= 0 {
+//		let mut op = stack[k-1];
+//		fila.push(op);						//insere op na fila
+//		k -= 1;
+//		stack.pop();
+//	}
+
+	for f in fila.iter() {
+		print!("{}, ", f);
 	}
 
 }
