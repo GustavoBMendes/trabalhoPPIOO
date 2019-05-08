@@ -106,6 +106,7 @@ fn main() {
 				stack.pop();
 			}
 			stack.pop();
+			k -= 1;
 		}	
 
 	}
@@ -113,15 +114,16 @@ fn main() {
 	
 	println!("{}", k);
 
-//	while k >= 0 {
-//		let mut op = stack[k-1];
-//		fila.push(op);						//insere op na fila
-//		k -= 1;
-//		stack.pop();
-//	}
+	while k >= 1 {
+		let mut op = stack[k-1];
+		fila.push(op);						//insere op na fila
+		k -= 1;
+		stack.pop();
+	}
 
 	for f in fila.iter() {
 		print!("{}, ", f);
 	}
+	println!("");
 
 }
