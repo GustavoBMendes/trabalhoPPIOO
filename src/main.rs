@@ -75,8 +75,19 @@ fn main() {
 			fila.push(tokens); 			//é um número, adicionar na fila de saída
 		}
 
-		else if tokens == &"*" || tokens == &"/" || tokens == &"(" {
+		else if tokens == &"*" || tokens == &"(" {
 			stack.push(tokens);	//operadores de maior precedencia, empilha
+			k += 1;
+		}
+
+		else if tokens == &"/" {
+			while stack[k-1] == "*" {
+				let mut op = stack[k-1];
+				fila.push(op);
+				k -= 1;
+				stack.pop();
+			}
+			stack.push(tokens);
 			k += 1;
 		}
 
@@ -95,6 +106,7 @@ fn main() {
 					stack.pop();
 				}
 				stack.push(tokens);
+				k += 1;
 			}
 		}
 
@@ -125,5 +137,67 @@ fn main() {
 		print!("{}, ", f);
 	}
 	println!("");
+
+	println!("Criando pilha de execução dos operadores");
+	let mut pilhaOperacoes: Vec<i32> = Vec::new();
+	let mut x = 0;
+	let mut num1 = 0;
+	let mut num2 = 0;
+	//let mut resultParcSS: &str;
+
+	//para cada numero encontrado na fila da notação reversa, ele sera inserido na pilha para realizar uma operação
+	for token in fila.iter(){	
+		
+		//se for um número, adicionar na pilha de operações 
+		if token != &"*" && token != &"/" && token != &"+" && token != &"-" {
+			pilhaOperacoes.push(token.parse::<i32>().unwrap());
+			x += 1;
+			println!("Pilha operações[{}] = {}", x, pilhaOperacoes[x-1]);
+		}
+
+
+		//caso for um operador, desempilha os dois primeiro numeros da pilha 
+		//realiza a operação, empilha o resultado
+		//mostra a equação com o resultado parcial
+
+		else if pilhaOperacoes.len() >= 2 {
+
+			num2 = pilhaOperacoes[x-1];
+			pilhaOperacoes.pop(); 
+			x -= 1;
+			num1 = pilhaOperacoes[x-1];
+			pilhaOperacoes.pop();
+
+			if token == &"+" {
+				let resultParc = num1 + num2;
+				pilhaOperacoes.push(resultParc);
+			}
+
+			else if token == &"-" {
+				let resultParc = num1 - num2;
+				pilhaOperacoes.push(resultParc);
+			}
+
+			else if token == &"*" {
+				let resultParc = num1 * num2;
+				pilhaOperacoes.push(resultParc);
+			}
+
+			else if token == &"/" {
+				let resultParc = num1 / num2;
+				pilhaOperacoes.push(resultParc);
+			}
+
+			//let resultParc = resultParc.to_string();
+			//resultParcSS = &resultParc.to_string();
+			println!("Pilha operações[{}] = {}", x, pilhaOperacoes[x-1]);
+		}
+
+	}
+
+	for results in pilhaOperacoes.iter() {
+		println!("Resultado: {}", results);
+	}
+
 
 }
